@@ -1,6 +1,5 @@
 #! /usr/bin/env python3
 
-import os
 import sys
 import subprocess
 
@@ -10,7 +9,7 @@ try:
   print(result.stderr, file=sys.stderr)
   result.check_returncode()
 
-except subprocess.CalledProcessError as err:
+except subprocess.CalledProcessError:
   print('Running sqlite to create the DB failed', file=sys.stderr)
   exit(-1)
 except Exception as err:
