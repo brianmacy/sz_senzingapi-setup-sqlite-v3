@@ -1,11 +1,10 @@
 #! /usr/bin/env python3
 
-import os
-import sys
-import shutil
-
-from os.path import exists
 import json
+import os
+import shutil
+import sys
+from os.path import exists
 from urllib.parse import urlparse
 
 from senzing import G2Config, G2ConfigMgr, G2Exception
@@ -15,19 +14,19 @@ try:
   if not engine_config:
     print('The environment variable SENZING_ENGINE_CONFIGURATION_JSON must be set with a proper JSON configuration.', file=sys.stderr)
     print('Please see https://senzing.zendesk.com/hc/en-us/articles/360038774134-G2Module-Configuration-and-the-Senzing-API', file=sys.stderr)
-    exit(-1)
+    sys.exit(-1)
 
   parsed_config = json.loads(engine_config)
   backend = parsed_config['SQL'].get('BACKEND')
   if backend and backend != 'SQL':
     print('Clustered backends are not supported', file=sys.stderr)
-    exit(-1)
+    sys.exit(-1)
 
   conn = parsed_config['SQL']['CONNECTION']
   uri = urlparse(conn)
   if uri.scheme != 'sqlite3':
     print(f'Only sqlite3 DBs are supported. Found [{uri.scheme}]', file=sys.stderr)
-    exit(-1)
+    sys.exit(-1)
 
   if exists(uri.path):
     print(f'Database [{uri.path}] exists. Skipping creation.')
@@ -60,10 +59,10 @@ try:
 
 except G2Exception as err:
   print(err, file=sys.stderr)
-  exit(-1)
-except Exception as err:
+  sys.exit(-1)
+except (ValueError, KeyError, TypeError, AttributeError, OSError) as err:
   print('The environment variable SENZING_ENGINE_CONFIGURATION_JSON must be set with a proper JSON configuration.', file=sys.stderr)
   print('Please see https://senzing.zendesk.com/hc/en-us/articles/360038774134-G2Module-Configuration-and-the-Senzing-API', file=sys.stderr)
   print(err, file=sys.stderr)
-  exit(-1)
+  sys.exit(-1)
 
